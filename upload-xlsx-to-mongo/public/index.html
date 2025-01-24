@@ -4,12 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Upload Excel File</title>
+  <link rel="stylesheet" href="styles.css"> <!-- Link the CSS file -->
 </head>
 <body>
-  <h1>Upload Excel File to MongoDB</h1>
-  <form action="/upload" method="POST" enctype="multipart/form-data">
-    <input type="file" name="file" accept=".xlsx" required />
-    <button type="submit">Upload</button>
-  </form>
+  <div class="container">
+    <h1>Upload Excel File to MongoDB</h1>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+      <input type="file" name="file" accept=".xlsx" required />
+      <button type="submit">Upload</button>
+    </form>
+  </div>
 </body>
 </html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Rated Power</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://i.postimg.cc/g0SGBTGC/2149192692.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+        body:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: rgba(109, 69, 69, 0.5);
+            z-index: 1;
+        }
+        .container {
+            background: rgba(199, 195, 195, 0.9);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            color: #33a;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        footer {
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+        }
+        canvas {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analyze Rated Power</h1>
+        <label for="file1Input">Upload Day 1 File:</label>
+        <input type="file" id="file1Input" accept=".xlsx" />
+
+        <label for="file2Input">Upload Day 2 File:</label>
+        <input type="file" id="file2Input" accept=".xlsx" />
+
+        <label for="file3Input">Upload Day 3 File:</label>
+        <input type="file" id="file3Input" accept=".xlsx" />
+
+        <div class="buttons">
+            <button id="analyzeBtn">Analyze Files</button>
+        </div>
+
+        <canvas id="powerChart" width="800" height="400"></canvas>
+    </div>
+
+    <footer>Developed by NOC Team</footer>
+
+    <script>
+        document.getElementById("analyzeBtn").addEventListener("click", () => {
+            const file1Input = document.getElementById("file1Input");
+            const file2Input = document.getElementById("file2Input");
+            const file3Input = document.getElementById("file3Input");
+
+            if (!file1Input.files.length || !file2Input.files.length || !file3Input.files.length) {
+                alert("Please upload all three files.");
+                return;
+            }
+
+            const files = [file1Input.files[0], file2Input.files[0], file3Input.files[0]];
+            const fileContents = [];
+            let completedReads = 0;
+
+            files.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const data = new Uint8Array(event.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                    fileContents[index] = rows;
+                    completedReads++;
+
+                    if (completedReads === 3) {
+                        try {
+                            const chartData = analyzeFiles(fileContents);
+                            drawChart(chartData);
+                        } catch (error) {
+                            alert(error.message);
+                        }
+                    }
+                };
+
+                reader.readAsArrayBuffer(file);
+            });
+        });
+
+        function normalizeHeaders(headers) {
+            return headers.map(header => header.trim().toLowerCase());
+        }
+
+        function analyzeFiles(fileContents) {
+            const allData = {};
+            const days = ["Day 1", "Day 2", "Day 3"];
+
+            fileContents.forEach((file, dayIndex) => {
+                const rows = file;
+                const headers = normalizeHeaders(rows[0]);
+                const serialIndex = headers.indexOf("sn");
+                const yieldIndex = headers.indexOf("daily yield(kwh)");
+                const ratedPowerIndex = headers.indexOf("rated power(kwh)");
+
+                if (serialIndex === -1 || yieldIndex === -1 || ratedPowerIndex === -1) {
+                    throw new Error("Required columns not found in file.");
+                }
+
+                rows.slice(1).forEach(row => {
+                    const serialNumber = (row[serialIndex] || "").toString().trim();
+                    const yieldValue = parseFloat((row[yieldIndex] || "").toString().trim()) || 0;
+
+                    if (!serialNumber) return;
+
+                    if (!allData[serialNumber]) {
+                        allData[serialNumber] = { "SN": serialNumber, data: [] };
+                    }
+
+                    allData[serialNumber].data[dayIndex] = yieldValue;
+                });
+            });
+
+            return Object.values(allData).map(data => ({
+                label: data.SN,
+                data: data.data,
+                borderColor: getRandomColor(),
+                borderWidth: 2,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                fill: false
+            }));
+        }
+
+        function drawChart(chartData) {
+            const ctx = document.getElementById("powerChart").getContext("2d");
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ["Day 1", "Day 2", "Day 3"],
+                    datasets: chartData
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Power Variation Over Days',
+                            font: {
+                                size: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Days',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Power (kWh)',
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+    </script>
+</body>
+</html>
