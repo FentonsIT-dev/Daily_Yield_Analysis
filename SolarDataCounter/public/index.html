@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solar Data Counter</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Solar Data Counter</h1>
+    <button id="fetchCount">Get Count</button>
+    <p id="result">Click the button to fetch the count.</p>
+  </div>
+
+  <script>
+    document.getElementById("fetchCount").addEventListener("click", async () => {
+      const response = await fetch("/count");
+      const data = await response.json();
+      document.getElementById("result").textContent = `Total Count: ${data.count}`;
+    });
+  </script>
+</body>
+</html>

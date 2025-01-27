@@ -6,7 +6,7 @@ const path = require("path");
 const os = require("os");
 
 const app = express();
-const PORT = 3000;
+const PORT = 30011;
 
 // Configure Multer (for handling file uploads)
 const upload = multer({ dest: "uploads/" });
