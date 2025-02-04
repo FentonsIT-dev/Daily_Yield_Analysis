@@ -1,0 +1,169 @@
+/* Background color from previous project */
+body {
+    background: #1f2029; /* Dark blue theme */
+    color: white;
+}
+
+.error-inverters-container {
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.error-inverters-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* Container for aligning search bar and dropdown */
+.filter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px; /* Increased gap between search bar and dropdown */
+    margin-bottom: 50px; /* Increased margin below the filter */
+    padding: 10px 0;
+}
+
+/* Centered Search Bar */
+.styled-input {
+    width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #f8ab37; /* Yellow border */
+    background: #353746; /* Dark gray background */
+    color: white;
+    font-size: 16px;
+    outline: none;
+    text-align: center;
+    transition: 0.3s;
+    margin-bottom: 20px; /* Increased bottom margin */
+}
+
+.styled-input::placeholder {
+    color: #f8ab37;
+    opacity: 0.7;
+}
+
+.styled-input:focus {
+    border-color: #da2c4d; /* Red border on focus */
+    box-shadow: 0 0 8px rgba(218, 44, 77, 0.8);
+}
+
+/* Dropdown Styling */
+.styled-dropdown {
+    width: 200px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #f8ab37; /* Yellow border */
+    background: #353746; /* Dark gray background */
+    color: white;
+    font-size: 16px;
+    outline: none;
+    transition: 0.3s;
+    text-align: center;
+    margin-top: 10px; /* Increased margin above dropdown */
+}
+
+.styled-dropdown:focus {
+    border-color: #da2c4d; /* Red border on focus */
+    box-shadow: 0 0 8px rgba(218, 44, 77, 0.8);
+}
+
+.styled-dropdown option {
+    background: #353746;
+    color: white;
+}
+
+/* Download Button Positioned to Right Corner */
+.styled-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: #6c757d; /* Gray background */
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.styled-button:hover {
+    background: #5a6268; /* Darker gray on hover */
+    box-shadow: 0 4px 8px rgba(90, 98, 104, 0.5);
+}
+
+.inverter-card {
+    border: 1px solid red;
+    padding: 15px;
+    margin-bottom: 30px; /* Increased margin for better spacing */
+    background: #353746; /* Dark gray background for better contrast */
+    color: white;
+    position: relative;
+}
+
+/* Position Rated Power to the right top corner and increase size */
+.rated-power {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-align: right;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 20px 25px;
+    padding: 30px; /* Increased padding for spacing */
+    justify-content: center;
+}
+
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 65px;
+    height: 65px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    margin: 15px 15px; /* Increased margin */
+    padding: 7px;
+}
+
+/* Fault inverter colors remain */
+.fault-inverter {
+    background: linear-gradient(298deg, #da2c4d, #f8ab37);
+    color: white;
+}
+
+/* Normal inverter changed to gray */
+.normal-inverter {
+    background: #6c757d;
+    color: white;
+}
+
+.normal-yield {
+    background: #d4edda;
+}
+
+.low-yield {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Text color adjustments */
+.daily-yield-title {
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+}
